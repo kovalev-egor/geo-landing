@@ -51,6 +51,7 @@ export async function serveLanding(context, landingId, selection = null) {
       country: geo.country,
       region: geo.region,
       city: geo.city,
+      place: geo.city || "Near you",
       offer_id: offer?.id || "",
       offer_url: offer?.url || "",
       preview: preview

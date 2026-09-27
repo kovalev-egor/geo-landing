@@ -1,0 +1,16 @@
+{
+  "id": "alice",
+  "name": "Alice",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "headline": "Alice",
+        "subheadline": "Catch me here",
+        "cta": "My free OF 🎁",
+        "done": "Opening…",
+        "hero": "/landings/alice/images/alice.jpg"
+      }
+    }
+  }
+}

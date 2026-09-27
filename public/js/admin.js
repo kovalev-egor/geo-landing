@@ -17,6 +17,8 @@ const RANGES = [
 
 const numberFormat = new Intl.NumberFormat("ru-RU");
 
+let editingOffer = null;
+
 const app = document.querySelector("#app");
 window.addEventListener("hashchange", render);
 render();
@@ -319,8 +321,6 @@ const OFFER_KINDS = [
   ["telegram", "Telegram"],
 ];
 
-let editingOffer = null;
-
 function renderOffers(data) {
   const wrap = el("div");
   wrap.append(el("h2", null, "Ссылки на офферы"));
@@ -331,6 +331,13 @@ function renderOffers(data) {
   for (const offer of data.offers) list.append(offerCard(offer, data));
   wrap.append(list, renderShareGroups(data, "Как главная делит трафик"));
   return wrap;
+}
+
+function geoLabel(offer) {
+  if (offer.geo_mode === "deny") {
+    return offer.geos.length ? `все, кроме ${offer.geos.length} стран` : "все страны";
+  }
+  return offer.geos.length ? offer.geos.join(", ") : "все страны";
 }
 
 function offerForm(offer) {
@@ -348,16 +355,27 @@ function offerForm(offer) {
   const button = field("Текст кнопки", "text", offer?.button_text || "");
   const geos = field("Страны", "text", (offer?.geos || []).join(", "), "US, DE, BR");
   const all = el("input", { type: "checkbox" });
-  all.checked = Boolean(offer && offer.geos.length === 0);
+  const except = el("input", { type: "checkbox" });
+  all.checked = Boolean(offer && offer.geo_mode !== "deny" && offer.geos.length === 0);
+  except.checked = offer?.geo_mode === "deny";
   const allWrap = el("label", { class: "checks" });
   allWrap.append(all, document.createTextNode("Все страны"));
+  const exceptWrap = el("label", { class: "checks" });
+  exceptWrap.append(except, document.createTextNode("Все страны, кроме списка"));
   const submit = el("button", { class: "primary", type: "submit" }, offer ? "Сохранить" : "Добавить ссылку");
   const error = el("p", { class: "error" });
-  form.append(el("h3", null, offer ? "Изменить ссылку" : "Новая ссылка"), name.label, kindWrap, url.label, button.label, geos.label, allWrap, submit, error);
+  form.append(el("h3", null, offer ? "Изменить ссылку" : "Новая ссылка"), name.label, kindWrap, url.label, button.label, geos.label, allWrap, exceptWrap, submit, error);
   const syncGeos = () => {
     geos.input.disabled = all.checked;
   };
-  all.addEventListener("change", syncGeos);
+  all.addEventListener("change", () => {
+    if (all.checked) except.checked = false;
+    syncGeos();
+  });
+  except.addEventListener("change", () => {
+    if (except.checked) all.checked = false;
+    syncGeos();
+  });
   syncGeos();
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -367,6 +385,7 @@ function offerForm(offer) {
       kind: kind.value,
       url: url.input.value,
       button_text: button.input.value,
+      geo_mode: except.checked ? "deny" : "allow",
       geos: all.checked ? [] : geos.input.value.split(/[\s,;]+/).filter(Boolean),
     };
     try {
@@ -384,7 +403,7 @@ function offerForm(offer) {
 function offerCard(offer, data) {
   const card = el("article", { class: "offer-card" });
   card.append(el("h3", null, offer.name));
-  card.append(el("p", { class: "blurb" }, `${kindLabel(offer.kind)} · кнопка «${offer.button_text}» · ${offer.geos.length ? offer.geos.join(", ") : "все страны"}`));
+  card.append(el("p", { class: "blurb" }, `${kindLabel(offer.kind)} · кнопка «${offer.button_text}» · ${geoLabel(offer)}`));
   card.append(el("p", null, offer.url));
   const used = offer.landings.map((link) => data.landings.find((item) => item.id === link.id)?.name || link.id);
   card.append(el("p", { class: "note" }, used.length ? `Лендинги: ${used.join(", ")}` : "Пока не подключена ни к одному лендингу."));
@@ -421,7 +440,7 @@ function renderLandingLinks(landing, catalog) {
   attached.forEach((offer, index) => {
     const row = el("div", { class: "link-row" });
     row.append(el("strong", null, `${index + 1}. ${offer.name}`));
-    row.append(document.createTextNode(`${kindLabel(offer.kind)} · ${offer.button_text} · ${offer.geos.length ? offer.geos.join(", ") : "все страны"}`));
+    row.append(document.createTextNode(`${kindLabel(offer.kind)} · ${offer.button_text} · ${geoLabel(offer)}`));
     const up = el("button", { type: "button", class: "ghost" }, "Выше");
     const down = el("button", { type: "button", class: "ghost" }, "Ниже");
     const remove = el("button", { type: "button", class: "ghost" }, "Убрать");

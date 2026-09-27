@@ -4,7 +4,7 @@ import { resolveContent, safeHero } from "../functions/_lib/content.js";
 import { resolveGeo } from "../functions/_lib/geo.js";
 import { readCookie, resolveVariant } from "../functions/_lib/cookies.js";
 import { conversion } from "../functions/_lib/db.js";
-import { assignShares, pickOffer, validateOfferUrl } from "../functions/_lib/offers.js";
+import { assignShares, encodeGeos, pickOffer, readStoredGeos, validateOfferUrl } from "../functions/_lib/offers.js";
 
 const config = {
   variants: {
@@ -82,6 +82,18 @@ const offers = [
 assert.equal(pickOffer(offers, "US").id, "us");
 assert.equal(pickOffer(offers, "DE").id, "de");
 assert.equal(pickOffer(offers, "FR").id, "world");
+
+const stored = readStoredGeos(encodeGeos("deny", ["MX", "VN", "mx"]));
+assert.equal(stored.mode, "deny");
+assert.deepEqual(stored.codes, ["MX", "VN"]);
+const routed = [
+  { id: "of", priority: 0, geos: ["MX", "VN"], geoMode: "deny" },
+  { id: "cam", priority: 1, geos: ["MX", "US"] },
+  { id: "tg", priority: 2, geos: [] },
+];
+assert.equal(pickOffer(routed, "US").id, "of");
+assert.equal(pickOffer(routed, "MX").id, "cam");
+assert.equal(pickOffer(routed, "VN").id, "tg");
 assert.equal(validateOfferUrl("telegram", "https://t.me/geo"), "https://t.me/geo");
 assert.equal(validateOfferUrl("telegram", "https://example.com"), "");
 assert.equal(validateOfferUrl("octocpa", "http://example.com/offer"), "");

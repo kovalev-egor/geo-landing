@@ -11,7 +11,7 @@ export function routeToken(landingId, offerId) {
 }
 
 export async function prepareHome(context) {
-  const fallback = { landingId: "default", offer: null, cookies: [], countImpression: false, country: "" };
+  const fallback = { landingId: "alice", offer: null, cookies: [], countImpression: false, country: "" };
   if (!context.env?.DB) return fallback;
   try {
     const registry = await loadRegistry(context);
@@ -70,13 +70,15 @@ export async function loadOfferGraph(db) {
   ]);
   const offers = new Map();
   for (const row of offersResult?.results || []) {
+    const stored = readStoredGeos(row.geos);
     offers.set(row.id, {
       id: row.id,
       name: row.name,
       kind: row.kind,
       url: row.url,
       buttonText: row.button_text,
-      geos: readStoredGeos(row.geos),
+      geos: stored.codes,
+      geoMode: stored.mode,
     });
   }
   const links = new Map();

@@ -11,9 +11,14 @@ export function parseGeos(value) {
     const code = normalizeCountry(item);
     if (!code || code === "XX" || geos.includes(code)) continue;
     geos.push(code);
-    if (geos.length >= 50) break;
+    if (geos.length >= 300) break;
   }
   return geos;
+}
+
+export function encodeGeos(mode, codes) {
+  const list = parseGeos(codes);
+  return JSON.stringify(mode === "deny" ? { exclude: list } : list);
 }
 
 export function validateOfferUrl(kind, value) {
@@ -45,9 +50,15 @@ export function offerIdFromName(name) {
   return `${base}-${suffix}`.slice(0, 64);
 }
 
+export function offerMatchesCountry(offer, country) {
+  const codes = offer.geos || [];
+  if (offer.geoMode === "deny") return !codes.includes(country);
+  return codes.length === 0 || codes.includes(country);
+}
+
 export function pickOffer(offers, country) {
   const ranked = [...offers].sort((left, right) => left.priority - right.priority || String(left.id).localeCompare(String(right.id)));
-  return ranked.find((offer) => offer.geos.length === 0 || offer.geos.includes(country)) || null;
+  return ranked.find((offer) => offerMatchesCountry(offer, country)) || null;
 }
 
 export function comboWeights(rows) {
@@ -81,8 +92,11 @@ export function pickWeighted(rows, random) {
 export function readStoredGeos(value) {
   try {
     const parsed = JSON.parse(value || "[]");
-    return parseGeos(parsed);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return { mode: "deny", codes: parseGeos(parsed.exclude) };
+    }
+    return { mode: "allow", codes: parseGeos(parsed) };
   } catch {
-    return [];
+    return { mode: "allow", codes: [] };
   }
 }

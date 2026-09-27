@@ -1,17 +1,7 @@
 [
   {
-    "id": "landing-1",
-    "name": "Northline",
-    "blurb": "Куртки для плохой погоды"
-  },
-  {
-    "id": "landing-2",
-    "name": "Atelier Sol",
-    "blurb": "Запись на гончарный круг"
-  },
-  {
-    "id": "default",
-    "name": "Waypoint",
-    "blurb": "Тихие карты для прогулок"
+    "id": "alice",
+    "name": "Alice",
+    "blurb": "Alice"
   }
 ]

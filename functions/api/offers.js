@@ -2,6 +2,7 @@ import { databaseError } from "../_lib/db.js";
 import { ID_RE, json, loadRegistry } from "../_lib/http.js";
 import {
   OFFER_KINDS,
+  encodeGeos,
   offerIdFromName,
   parseGeos,
   validateOfferUrl,
@@ -36,6 +37,7 @@ async function listOffers(context) {
     url: offer.url,
     button_text: offer.buttonText,
     geos: offer.geos,
+    geo_mode: offer.geoMode || "allow",
     landings: landingIds.flatMap((landingId) => {
       const link = (graph.links.get(landingId) || []).find((item) => item.id === offer.id);
       return link ? [{ id: landingId, priority: link.priority }] : [];
@@ -54,7 +56,7 @@ async function createOffer(context) {
   const id = offerIdFromName(input.name);
   await context.env.DB.prepare(
     "INSERT INTO offers (id, name, kind, url, button_text, geos) VALUES (?, ?, ?, ?, ?, ?)",
-  ).bind(id, input.name, input.kind, input.url, input.buttonText, JSON.stringify(input.geos)).run();
+  ).bind(id, input.name, input.kind, input.url, input.buttonText, encodeGeos(input.geoMode, input.geos)).run();
   return json({ id }, 201);
 }
 
@@ -70,7 +72,7 @@ async function updateOffer(context) {
   if (!existing) return json({ error: "missing", message: "Ссылка не найдена." }, 404);
   await context.env.DB.prepare(
     "UPDATE offers SET name = ?, kind = ?, url = ?, button_text = ?, geos = ? WHERE id = ?",
-  ).bind(input.name, input.kind, input.url, input.buttonText, JSON.stringify(input.geos), id).run();
+  ).bind(input.name, input.kind, input.url, input.buttonText, encodeGeos(input.geoMode, input.geos), id).run();
   return json({ id });
 }
 
@@ -130,6 +132,7 @@ function normalizeOffer(value) {
   const kind = String(value.kind || "");
   const buttonText = String(value.button_text || "").trim().slice(0, 80);
   const url = validateOfferUrl(kind, value.url);
+  const geoMode = value.geo_mode === "deny" ? "deny" : "allow";
   const geos = parseGeos(value.geos);
   if (!name) return { error: json({ error: "name", message: "Укажите название ссылки." }, 400) };
   if (!OFFER_KINDS.has(kind)) return { error: json({ error: "kind", message: "Выберите тип ссылки." }, 400) };
@@ -140,7 +143,7 @@ function normalizeOffer(value) {
       : "Нужна ссылка, которая начинается с https://";
     return { error: json({ error: "url", message }, 400) };
   }
-  return { name, kind, buttonText, url, geos };
+  return { name, kind, buttonText, url, geos, geoMode };
 }
 
 async function readBody(context) {

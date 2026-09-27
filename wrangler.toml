@@ -2,8 +2,8 @@ name = "geo-landings"
 compatibility_date = "2024-12-30"
 pages_build_output_dir = "public"
 
-# После `npx wrangler d1 create geo-landings` подставьте сюда настоящий database_id.
+# Удалённая база geo-landings, регион EEUR.
 [[d1_databases]]
 binding = "DB"
 database_name = "geo-landings"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "bcaecbee-d7d9-4ec0-b733-18d65075901d"

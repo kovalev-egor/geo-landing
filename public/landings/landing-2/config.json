@@ -1,0 +1,74 @@
+{
+  "id": "landing-2",
+  "name": "Atelier Sol",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "eyebrow": "Six seats a week",
+        "headline": "Throw a bowl while the clay is still warm",
+        "subheadline": "Two hours at the wheel in a small studio. Clay, firing, and one finished piece to take home.",
+        "cta": "Hold a seat",
+        "done": "Request sent. We'll reply with times today.",
+        "proof": "$68 includes clay and firing",
+        "hero": "/landings/landing-2/images/hero-a.svg"
+      },
+      "geo": {
+        "FR": {
+          "lang": "fr",
+          "eyebrow": "Six places par semaine",
+          "headline": "Tournez un bol pendant que l'argile est encore tiède",
+          "subheadline": "Deux heures au tour, dans un petit atelier. L'argile, la cuisson et une pièce à emporter sont incluses.",
+          "cta": "Garder une place",
+          "done": "Demande envoyée. Nous répondons avec les horaires aujourd'hui.",
+          "proof": "68 €, argile et cuisson comprises",
+          "hero": "/landings/landing-2/images/hero-fr.svg"
+        },
+        "BR": {
+          "lang": "pt",
+          "eyebrow": "Seis lugares por semana",
+          "headline": "Modele uma tigela enquanto o barro ainda está morno",
+          "subheadline": "Duas horas no torno, em um ateliê pequeno. Barro, queima e uma peça para levar estão inclusos.",
+          "cta": "Garantir um lugar",
+          "done": "Pedido enviado. Respondemos com os horários ainda hoje.",
+          "proof": "R$ 220, com barro e queima",
+          "hero": "/landings/landing-2/images/hero-br.svg"
+        }
+      }
+    },
+    "B": {
+      "default": {
+        "lang": "en",
+        "eyebrow": "Open this week",
+        "headline": "Your hands. Wet clay. Two hours.",
+        "subheadline": "A straightforward wheel session. You leave with one piece, fired and ready.",
+        "cta": "Book the wheel",
+        "done": "Request sent. Check your inbox for a time.",
+        "proof": "$68, everything included",
+        "hero": "/landings/landing-2/images/hero-b.svg"
+      },
+      "geo": {
+        "FR": {
+          "lang": "fr",
+          "eyebrow": "Cette semaine",
+          "headline": "Vos mains. L'argile humide. Deux heures.",
+          "subheadline": "Une séance simple au tour. Vous repartez avec une pièce, cuite et prête.",
+          "cta": "Réserver le tour",
+          "done": "Demande envoyée. L'horaire arrive par e-mail.",
+          "proof": "68 €, tout compris",
+          "hero": "/landings/landing-2/images/hero-fr.svg"
+        },
+        "BR": {
+          "lang": "pt",
+          "eyebrow": "Esta semana",
+          "headline": "Suas mãos. Barro úmido. Duas horas.",
+          "subheadline": "Uma sessão direta no torno. Você sai com uma peça queimada e pronta.",
+          "cta": "Reservar o torno",
+          "done": "Pedido enviado. O horário chega por e-mail.",
+          "proof": "R$ 220, tudo incluso",
+          "hero": "/landings/landing-2/images/hero-br.svg"
+        }
+      }
+    }
+  }
+}

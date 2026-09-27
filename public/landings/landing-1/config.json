@@ -1,0 +1,99 @@
+{
+  "id": "landing-1",
+  "name": "Northline",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "eyebrow": "Field notes",
+        "headline": "A jacket that stays out when the weather turns",
+        "subheadline": "Waxed cotton, sealed seams, and a hood that turns with your head. Made for weeks outside, not a weekend lookbook.",
+        "cta": "Reserve the jacket",
+        "done": "Saved. We'll write when your size is cut.",
+        "proof": "Free repairs for two winters",
+        "hero": "/landings/landing-1/images/hero-a.svg"
+      },
+      "geo": {
+        "US": {
+          "eyebrow": "Ships from the U.S.",
+          "headline": "The field jacket, sent from our U.S. workshop",
+          "proof": "Free shipping over $120 · 3–5 days",
+          "hero": "/landings/landing-1/images/hero-a.svg"
+        },
+        "US-CA": {
+          "eyebrow": "Cut in Los Angeles",
+          "headline": "A lighter California shell for coast fog",
+          "subheadline": "The same waxed cotton, with a thinner lining for Pacific mornings and high-desert nights.",
+          "cta": "Reserve a California cut",
+          "done": "Saved. Los Angeles will confirm your size.",
+          "proof": "Ships from Los Angeles in 2 days",
+          "hero": "/landings/landing-1/images/hero-ca.svg"
+        },
+        "DE": {
+          "lang": "de",
+          "eyebrow": "Für draußen",
+          "headline": "Die Jacke für Wetter, das andere nach Hause schickt",
+          "subheadline": "Gewachste Baumwolle, versiegelte Nähte und eine Kapuze, die der Kopfbewegung folgt.",
+          "cta": "Jacke reservieren",
+          "done": "Notiert. Wir melden uns, wenn deine Größe zugeschnitten ist.",
+          "proof": "Zwei Winter Reparatur inklusive · Versand in 4 Tagen",
+          "hero": "/landings/landing-1/images/hero-de.svg"
+        },
+        "JP": {
+          "lang": "ja",
+          "eyebrow": "野外のために",
+          "headline": "人を家に返す天気のためのジャケット",
+          "subheadline": "ワックスコットン、シームテープ、顔の動きに沿うフード。週末の見本ではなく、長く外にいるための一着。",
+          "cta": "ジャケットを予約する",
+          "done": "受け付けました。サイズが決まり次第ご連絡します。",
+          "proof": "2年間の修理付き · 4日以内に発送",
+          "hero": "/landings/landing-1/images/hero-jp.svg"
+        }
+      }
+    },
+    "B": {
+      "default": {
+        "lang": "en",
+        "eyebrow": "The shell",
+        "headline": "Stay out longer.",
+        "subheadline": "The Northline shell sheds weather without the plastic shine. Four pockets. One repair promise.",
+        "cta": "Get the shell",
+        "done": "You're on the list.",
+        "proof": "Repairs included for 2 years",
+        "hero": "/landings/landing-1/images/hero-b.svg"
+      },
+      "geo": {
+        "US": {
+          "proof": "Free U.S. shipping over $120"
+        },
+        "US-CA": {
+          "eyebrow": "Los Angeles",
+          "headline": "Stay out longer on the coast.",
+          "cta": "Get the California shell",
+          "proof": "Ships from Los Angeles in 2 days",
+          "hero": "/landings/landing-1/images/hero-ca.svg"
+        },
+        "DE": {
+          "lang": "de",
+          "eyebrow": "Die Shell",
+          "headline": "Länger draußen bleiben.",
+          "subheadline": "Die Northline-Shell hält Wetter ab, ohne wie Plastik zu glänzen. Vier Taschen. Ein Reparaturversprechen.",
+          "cta": "Shell sichern",
+          "done": "Du stehst auf der Liste.",
+          "proof": "Reparatur für 2 Jahre inklusive",
+          "hero": "/landings/landing-1/images/hero-de.svg"
+        },
+        "JP": {
+          "lang": "ja",
+          "eyebrow": "シェル",
+          "headline": "もっと長く、外に。",
+          "subheadline": "プラスチックの光沢なしで天気を落とすシェル。ポケットは四つ。修理の約束は一つ。",
+          "cta": "シェルを手に入れる",
+          "done": "リストに入りました。",
+          "proof": "2年間の修理付き",
+          "hero": "/landings/landing-1/images/hero-jp.svg"
+        }
+      }
+    }
+  }
+}

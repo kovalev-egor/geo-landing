@@ -1,0 +1,15 @@
+{
+  "name": "geo-landings",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "check": "node scripts/check.mjs",
+    "db:migrate": "wrangler d1 execute geo-landings --local --file=./schema.sql",
+    "db:migrate:remote": "wrangler d1 execute geo-landings --remote --file=./schema.sql",
+    "deploy": "wrangler pages deploy public --project-name geo-landings"
+  },
+  "devDependencies": {
+    "wrangler": "3.105.0"
+  }
+}

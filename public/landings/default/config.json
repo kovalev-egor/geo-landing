@@ -1,0 +1,53 @@
+{
+  "id": "default",
+  "name": "Waypoint",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "eyebrow": "Offline after the first block",
+        "headline": "Walk a city without staring at a blue dot",
+        "subheadline": "Quieter directions, maps that stay downloaded, and routes that prefer the long way when you have the time.",
+        "cta": "Try Waypoint",
+        "done": "You're in. The first three walks need no account.",
+        "proof": "No account for the first three walks",
+        "hero": "/landings/default/images/hero-a.svg"
+      },
+      "geo": {
+        "GB": {
+          "lang": "en-GB",
+          "eyebrow": "Made for pavements",
+          "headline": "Walk a city without the blue dot shouting",
+          "subheadline": "Offline maps, quieter prompts, and routes that follow the river when the afternoon is free.",
+          "cta": "Try Waypoint in the UK",
+          "done": "You're in. The first three walks need no account.",
+          "proof": "Covers town centres across the UK",
+          "hero": "/landings/default/images/hero-gb.svg"
+        }
+      }
+    },
+    "B": {
+      "default": {
+        "lang": "en",
+        "eyebrow": "A smaller map",
+        "headline": "Maps for people who look up",
+        "subheadline": "Waypoint keeps the next turn in your pocket and the street in front of you.",
+        "cta": "Start walking",
+        "done": "Saved. Open Waypoint when you're outside.",
+        "proof": "Three walks before you need an account",
+        "hero": "/landings/default/images/hero-b.svg"
+      },
+      "geo": {
+        "GB": {
+          "lang": "en-GB",
+          "eyebrow": "UK streets",
+          "headline": "A calmer map for British pavements",
+          "subheadline": "The next turn stays in your pocket. The high street stays in front of you.",
+          "cta": "Start walking in the UK",
+          "proof": "Town-centre maps included",
+          "hero": "/landings/default/images/hero-gb.svg"
+        }
+      }
+    }
+  }
+}

@@ -1,13 +1,13 @@
 import { resolveContent, safeHero } from "./content.js";
 import { resolveVariant } from "./cookies.js";
-import { recordEvent } from "./db.js";
+import { recordCombo, recordEvent } from "./db.js";
 import { resolveGeo, previewEnabled } from "./geo.js";
 import { escapeHtml } from "./html.js";
 import { applyTemplate } from "./html.js";
 import { ID_RE, loadConfig, loadRegistry, readAsset, text } from "./http.js";
 import { buildPreviewBar } from "./preview.js";
 
-export async function serveLanding(context, landingId) {
+export async function serveLanding(context, landingId, selection = null) {
   const { request, env } = context;
   if (request.method !== "GET" && request.method !== "HEAD") {
     return text("Method not allowed", 405);
@@ -36,12 +36,13 @@ export async function serveLanding(context, landingId) {
     const variantState = resolveVariant(request, landingId, preview);
     content = resolveContent(config, variantState.variant, geo.country, geo.region);
     const hero = safeHero(content.hero, landingId) || `/landings/${landingId}/images/hero-a.svg`;
+    const offer = selection?.offer || null;
     const html = applyTemplate(await templateResponse, {
       lang: content.lang || "en",
       eyebrow: content.eyebrow || "",
       headline: content.headline || entry.name,
       subheadline: content.subheadline || "",
-      cta: content.cta || "Continue",
+      cta: offer?.buttonText || content.cta || "Continue",
       done: content.done || "Saved",
       proof: content.proof || "",
       hero,
@@ -50,6 +51,8 @@ export async function serveLanding(context, landingId) {
       country: geo.country,
       region: geo.region,
       city: geo.city,
+      offer_id: offer?.id || "",
+      offer_url: offer?.url || "",
       preview: preview
         ? buildPreviewBar({
           pageUrl: request.url,
@@ -67,16 +70,19 @@ export async function serveLanding(context, landingId) {
       "referrer-policy": "strict-origin-when-cross-origin",
       "x-content-type-options": "nosniff",
     });
-    if (variantState.cookie) headers.set("set-cookie", variantState.cookie);
+    if (variantState.cookie) headers.append("set-cookie", variantState.cookie);
+    for (const cookie of selection?.cookies || []) headers.append("set-cookie", cookie);
 
     if (request.method === "GET" && env.DB) {
-      const write = recordEvent(env.DB, "pageviews", {
+      const write = recordVisit(env.DB, {
         landingId,
         name: typeof config.name === "string" ? config.name.slice(0, 120) : entry.name,
         variant: variantState.variant,
-        country: geo.country,
+        country: selection?.country || geo.country,
         region: geo.region,
         city: geo.city,
+        offerId: offer?.id || "",
+        countImpression: Boolean(selection?.countImpression && offer?.id),
       }).catch((error) => console.error("pageview failed", error));
       if (typeof context.waitUntil === "function") context.waitUntil(write);
       else await write;
@@ -89,6 +95,16 @@ export async function serveLanding(context, landingId) {
   } catch (error) {
     console.error(error);
     return text("Landing could not be rendered.", 500);
+  }
+}
+
+async function recordVisit(db, event) {
+  await recordEvent(db, "pageviews", event);
+  if (!event.countImpression || !event.offerId) return;
+  try {
+    await recordCombo(db, "impressions", event);
+  } catch (error) {
+    console.error("combo impression failed", error);
   }
 }
 

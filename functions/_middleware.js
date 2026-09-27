@@ -31,7 +31,7 @@ export async function onRequest(context) {
     return context.next();
   }
 
-  const needsAuth = pathname === "/admin" || pathname.startsWith("/admin/") || pathname === "/api/landings" || pathname === "/api/stats";
+  const needsAuth = pathname === "/admin" || pathname.startsWith("/admin/") || pathname === "/api/landings" || pathname === "/api/stats" || pathname === "/api/offers" || pathname.startsWith("/api/offers/");
   if (!needsAuth) return context.next();
 
   if (!context.env?.ADMIN_KEY) {

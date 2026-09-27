@@ -1,4 +1,4 @@
-import { recordEvent } from "../_lib/db.js";
+import { recordCombo, recordEvent } from "../_lib/db.js";
 import { normalizeCountry, normalizeRegion, previewEnabled, resolveGeo, sanitizeCity } from "../_lib/geo.js";
 import { ID_RE, json, loadRegistry } from "../_lib/http.js";
 
@@ -14,6 +14,7 @@ export async function onRequestPost(context) {
 
   const landingId = String(payload.landing_id || "");
   const variant = payload.variant === "A" || payload.variant === "B" ? payload.variant : "";
+  const offerId = ID_RE.test(String(payload.offer_id || "")) ? String(payload.offer_id) : "";
   if (!ID_RE.test(landingId) || !variant) return json({ error: "invalid payload" }, 400);
 
   let registry;
@@ -42,6 +43,14 @@ export async function onRequestPost(context) {
       region,
       city,
     });
+    if (offerId) {
+      const attached = await context.env.DB.prepare(
+        "SELECT 1 AS ok FROM landing_offers WHERE landing_id = ? AND offer_id = ?",
+      ).bind(landingId, offerId).first();
+      if (attached) {
+        await recordCombo(context.env.DB, "clicks", { landingId, offerId, country });
+      }
+    }
   } catch (error) {
     console.error("click failed", error);
     const message = String(error?.message || error);

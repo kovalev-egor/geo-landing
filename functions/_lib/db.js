@@ -9,6 +9,23 @@ export function conversion(views, clicks) {
   return Math.round((clicks / views) * 1000) / 10;
 }
 
+export async function recordCombo(db, field, event) {
+  if (field !== "impressions" && field !== "clicks") {
+    throw new Error("Unknown combo field");
+  }
+  await db.prepare(
+    `INSERT INTO combo_stats (country, offer_id, landing_id, impressions, clicks)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(country, offer_id, landing_id) DO UPDATE SET ${field} = ${field} + 1`,
+  ).bind(
+    event.country || "XX",
+    event.offerId,
+    event.landingId,
+    field === "impressions" ? 1 : 0,
+    field === "clicks" ? 1 : 0,
+  ).run();
+}
+
 export async function recordEvent(db, table, event) {
   if (table !== "pageviews" && table !== "clicks") {
     throw new Error("Unknown analytics table");

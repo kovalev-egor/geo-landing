@@ -135,6 +135,43 @@ th { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.0
   min-height: 2px;
 }
 
+.offer-form, .offer-card {
+  display: grid;
+  gap: 10px;
+}
+
+label { display: grid; gap: 4px; font-size: 13px; }
+
+input, select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 8px 10px;
+}
+
+.checks { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+
+.checks input { width: auto; }
+
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 10px 14px;
+  justify-self: start;
+}
+
+.offer-list { display: grid; gap: 12px; }
+
+.offer-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 16px;
+}
+
+.offer-actions, .link-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
 .note, .error { color: var(--muted); }
 
 .error { color: #8c3a2f; }

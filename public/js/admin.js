@@ -25,9 +25,10 @@ function parseRoute() {
   const raw = location.hash.replace(/^#/, "") || "/";
   const url = new URL(raw, "https://admin.local");
   const range = url.searchParams.get("range");
-  const id = url.pathname.split("/").filter(Boolean)[0] || "";
+  const parts = url.pathname.split("/").filter(Boolean);
   return {
-    id,
+    page: parts[0] === "offers" ? "offers" : "landings",
+    id: parts[0] === "offers" ? "" : (parts[0] || ""),
     range: range === "7" || range === "30" ? range : "all",
   };
 }
@@ -47,19 +48,29 @@ function setHash(id, range) {
 
 async function render() {
   const route = parseRoute();
+  if (route.page !== "offers") editingOffer = null;
   app.replaceChildren(renderHeader(route));
   const main = el("main");
   main.append(el("p", { class: "note" }, "Загрузка…"));
   app.append(main);
   try {
+    if (route.page === "offers") {
+      const data = await getJson("/api/offers");
+      main.replaceChildren(renderOffers(data));
+      document.title = "Ссылки — лендинги";
+      return;
+    }
     if (!route.id) {
       const data = await getJson(`/api/landings?range=${route.range}`);
       main.replaceChildren(renderList(data, route));
       document.title = "Лендинги";
       return;
     }
-    const data = await getJson(`/api/stats?id=${encodeURIComponent(route.id)}&range=${route.range}`);
-    main.replaceChildren(renderDetail(data, route));
+    const [data, catalog] = await Promise.all([
+      getJson(`/api/stats?id=${encodeURIComponent(route.id)}&range=${route.range}`),
+      getJson("/api/offers"),
+    ]);
+    main.replaceChildren(renderDetail(data, route, catalog));
     document.title = `${data.landing.name} — лендинги`;
   } catch (error) {
     main.replaceChildren(el("p", { class: "error" }, error.message || "Не удалось загрузить аналитику."));
@@ -73,12 +84,13 @@ function renderHeader(route) {
   brand.append(el("a", { href: hashHref("", route.range) }, "Лендинги"));
   title.append(brand, el("p", { class: "sub" }, "Показы, клики и гео по каждому лендингу."));
   const actions = el("div", { class: "top-actions" });
+  const offersLink = el("a", { href: "#/offers" }, "Ссылки");
   const logout = el("button", { class: "ghost", type: "button" }, "Выйти");
   logout.addEventListener("click", async () => {
     await fetch("/api/logout", { method: "POST" });
     location.href = "/admin/";
   });
-  actions.append(logout);
+  actions.append(offersLink, logout);
   header.append(title, actions);
 
   const range = el("div", { class: "range" });
@@ -88,7 +100,8 @@ function renderHeader(route) {
     range.append(button);
   }
   const wrap = el("div");
-  wrap.append(header, range);
+  wrap.append(header);
+  if (route.page !== "offers") wrap.append(range);
   return wrap;
 }
 
@@ -126,7 +139,7 @@ function renderCard(landing, preview, route) {
   return card;
 }
 
-function renderDetail(data, route) {
+function renderDetail(data, route, catalog) {
   const landing = data.landing;
   const wrap = el("div");
   const head = el("div", { class: "detail-head" });
@@ -148,6 +161,8 @@ function renderDetail(data, route) {
 
   wrap.append(panel("Показы по дням, UTC", dayChart(landing.days)));
   wrap.append(panel("Города", cityTable(landing.cities)));
+  wrap.append(renderLandingLinks(landing, catalog));
+  wrap.append(renderLandingShares(landing.id, catalog));
   return wrap;
 }
 
@@ -296,6 +311,225 @@ function formatStamp(stamp) {
   const date = new Date(String(stamp).replace(" ", "T") + "Z");
   if (Number.isNaN(date.getTime())) return stamp;
   return new Intl.DateTimeFormat("ru-RU", { dateStyle: "long", timeZone: "UTC" }).format(date);
+}
+
+const OFFER_KINDS = [
+  ["octocpa", "OctoCPA"],
+  ["onlytraffic", "OnlyTraffic"],
+  ["telegram", "Telegram"],
+];
+
+let editingOffer = null;
+
+function renderOffers(data) {
+  const wrap = el("div");
+  wrap.append(el("h2", null, "Ссылки на офферы"));
+  wrap.append(el("p", { class: "note" }, "Новый лендинг — это папка в репозитории и пуш в master. Pages публикует её сам. Ссылку, страны, текст кнопки и приоритет меняйте здесь: для этого деплой не нужен. Пока ссылка не подключена к лендингу, главная страница / его не показывает."));
+  wrap.append(offerForm(editingOffer));
+  const list = el("div", { class: "offer-list" });
+  if (!data.offers.length) list.append(el("p", { class: "note" }, "Ссылок пока нет."));
+  for (const offer of data.offers) list.append(offerCard(offer, data));
+  wrap.append(list, renderShareGroups(data, "Как главная делит трафик"));
+  return wrap;
+}
+
+function offerForm(offer) {
+  const form = el("form", { class: "offer-form panel" });
+  const name = field("Название", "text", offer?.name || "");
+  const kind = el("select", { name: "kind" });
+  for (const [id, label] of OFFER_KINDS) {
+    const option = el("option", { value: id }, label);
+    if ((offer?.kind || "octocpa") === id) option.selected = true;
+    kind.append(option);
+  }
+  const kindWrap = el("label", null, "Тип");
+  kindWrap.append(kind);
+  const url = field("Ссылка", "url", offer?.url || "", "https://");
+  const button = field("Текст кнопки", "text", offer?.button_text || "");
+  const geos = field("Страны", "text", (offer?.geos || []).join(", "), "US, DE, BR");
+  const all = el("input", { type: "checkbox" });
+  all.checked = Boolean(offer && offer.geos.length === 0);
+  const allWrap = el("label", { class: "checks" });
+  allWrap.append(all, document.createTextNode("Все страны"));
+  const submit = el("button", { class: "primary", type: "submit" }, offer ? "Сохранить" : "Добавить ссылку");
+  const error = el("p", { class: "error" });
+  form.append(el("h3", null, offer ? "Изменить ссылку" : "Новая ссылка"), name.label, kindWrap, url.label, button.label, geos.label, allWrap, submit, error);
+  const syncGeos = () => {
+    geos.input.disabled = all.checked;
+  };
+  all.addEventListener("change", syncGeos);
+  syncGeos();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    error.textContent = "";
+    const payload = {
+      name: name.input.value,
+      kind: kind.value,
+      url: url.input.value,
+      button_text: button.input.value,
+      geos: all.checked ? [] : geos.input.value.split(/[\s,;]+/).filter(Boolean),
+    };
+    try {
+      if (offer) await sendJson("/api/offers", "PUT", { ...payload, id: offer.id });
+      else await sendJson("/api/offers", "POST", payload);
+      editingOffer = null;
+      render();
+    } catch (err) {
+      error.textContent = err.message;
+    }
+  });
+  return form;
+}
+
+function offerCard(offer, data) {
+  const card = el("article", { class: "offer-card" });
+  card.append(el("h3", null, offer.name));
+  card.append(el("p", { class: "blurb" }, `${kindLabel(offer.kind)} · кнопка «${offer.button_text}» · ${offer.geos.length ? offer.geos.join(", ") : "все страны"}`));
+  card.append(el("p", null, offer.url));
+  const used = offer.landings.map((link) => data.landings.find((item) => item.id === link.id)?.name || link.id);
+  card.append(el("p", { class: "note" }, used.length ? `Лендинги: ${used.join(", ")}` : "Пока не подключена ни к одному лендингу."));
+  const actions = el("div", { class: "offer-actions" });
+  const edit = el("button", { type: "button", class: "ghost" }, "Изменить");
+  const remove = el("button", { type: "button", class: "ghost" }, "Удалить");
+  edit.addEventListener("click", () => {
+    editingOffer = offer;
+    render();
+  });
+  remove.addEventListener("click", async () => {
+    if (!confirm(`Удалить ссылку «${offer.name}»?`)) return;
+    try {
+      await sendJson(`/api/offers?id=${encodeURIComponent(offer.id)}`, "DELETE");
+      if (editingOffer?.id === offer.id) editingOffer = null;
+      render();
+    } catch (error) {
+      card.append(el("p", { class: "error" }, error.message));
+    }
+  });
+  actions.append(edit, remove);
+  card.append(actions);
+  return card;
+}
+
+function renderLandingLinks(landing, catalog) {
+  const attached = catalog.offers
+    .filter((offer) => offer.landings.some((item) => item.id === landing.id))
+    .sort((left, right) => linkPriority(left, landing.id) - linkPriority(right, landing.id));
+  const section = el("section", { class: "panel" });
+  section.append(el("h3", null, "Ссылки по приоритету"));
+  section.append(el("p", { class: "note" }, "Сначала отбираются ссылки, которым разрешена страна посетителя. Из них на лендинге остаётся самая верхняя."));
+  const error = el("p", { class: "error" });
+  attached.forEach((offer, index) => {
+    const row = el("div", { class: "link-row" });
+    row.append(el("strong", null, `${index + 1}. ${offer.name}`));
+    row.append(document.createTextNode(`${kindLabel(offer.kind)} · ${offer.button_text} · ${offer.geos.length ? offer.geos.join(", ") : "все страны"}`));
+    const up = el("button", { type: "button", class: "ghost" }, "Выше");
+    const down = el("button", { type: "button", class: "ghost" }, "Ниже");
+    const remove = el("button", { type: "button", class: "ghost" }, "Убрать");
+    up.disabled = index === 0;
+    down.disabled = index === attached.length - 1;
+    up.addEventListener("click", () => reorderLinks(landing.id, attached, index, -1, error));
+    down.addEventListener("click", () => reorderLinks(landing.id, attached, index, 1, error));
+    remove.addEventListener("click", () => saveLinks(landing.id, attached.filter((item) => item.id !== offer.id).map((item) => item.id), error));
+    row.append(up, down, remove);
+    section.append(row);
+  });
+  if (!attached.length) section.append(el("p", { class: "note" }, "К этому лендингу ссылки ещё не подключены."));
+  const select = el("select");
+  select.append(el("option", { value: "" }, "Добавить ссылку"));
+  for (const offer of catalog.offers) {
+    if (attached.some((item) => item.id === offer.id)) continue;
+    select.append(el("option", { value: offer.id }, offer.name));
+  }
+  select.addEventListener("change", () => {
+    if (!select.value) return;
+    saveLinks(landing.id, [...attached.map((item) => item.id), select.value], error);
+  });
+  section.append(select, error);
+  return section;
+}
+
+function renderLandingShares(landingId, catalog) {
+  const data = {
+    ...catalog,
+    routes: (catalog.routes || []).filter((group) => group.candidates.some((row) => row.landing_id === landingId)),
+  };
+  return renderShareGroups(data, "Доля входа на /");
+}
+
+function renderShareGroups(data, title) {
+  const section = el("section", { class: "panel" });
+  section.append(el("h3", null, title));
+  section.append(el("p", { class: "note" }, "Адрес / выбирает связку страна + ссылка + лендинг. Пока кликов нет, лендинги делят трафик поровну. Дальше чаще показывается связка с большим числом кликов. Новый лендинг начинает рядом с лидером и постепенно уходит вниз, если не получает клики."));
+  const groups = data.routes || [];
+  if (!groups.length) {
+    section.append(el("p", { class: "note" }, "Ротация появится, когда хотя бы у одного лендинга будет ссылка."));
+    return section;
+  }
+  for (const group of groups) {
+    section.append(el("h3", null, group.country === "*" ? "Все страны" : countryName(group.country)));
+    const table = el("table");
+    table.append(tableHead(["Лендинг", "Ссылка", "Показы", "Клики", "Доля"]));
+    const body = el("tbody");
+    for (const row of group.candidates) {
+      const name = data.landings.find((item) => item.id === row.landing_id)?.name || row.landing_id;
+      body.append(tableRow([
+        name,
+        row.offer_name,
+        formatNumber(row.impressions),
+        formatNumber(row.clicks),
+        `${(row.share * 100).toFixed(1).replace(".", ",")}%`,
+      ]));
+    }
+    table.append(body);
+    section.append(el("div", { class: "scroll" }, table));
+  }
+  return section;
+}
+
+function field(label, type, value, placeholder) {
+  const input = el("input", { type, value, placeholder: placeholder || "" });
+  const node = el("label", null, label);
+  node.append(input);
+  return { label: node, input };
+}
+
+function kindLabel(kind) {
+  return OFFER_KINDS.find((item) => item[0] === kind)?.[1] || kind;
+}
+
+function linkPriority(offer, landingId) {
+  return offer.landings.find((item) => item.id === landingId)?.priority ?? 0;
+}
+
+function reorderLinks(landingId, attached, index, delta, error) {
+  const ids = attached.map((item) => item.id);
+  const next = index + delta;
+  [ids[index], ids[next]] = [ids[next], ids[index]];
+  return saveLinks(landingId, ids, error);
+}
+
+async function saveLinks(landingId, offerIds, error) {
+  error.textContent = "";
+  try {
+    await sendJson("/api/offers", "PUT", { action: "links", landing_id: landingId, offer_ids: offerIds });
+    render();
+  } catch (err) {
+    error.textContent = err.message;
+  }
+}
+
+async function sendJson(path, method, body) {
+  const response = await fetch(path, {
+    method,
+    headers: body == null ? undefined : { "content-type": "application/json" },
+    body: body == null ? undefined : JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (response.status === 401) {
+    throw new Error("Сессия недействительна. Обновите страницу и войдите снова.");
+  }
+  if (!response.ok) throw new Error(data.message || "Запрос завершился ошибкой.");
+  return data;
 }
 
 async function getJson(path) {

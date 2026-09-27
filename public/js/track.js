@@ -16,7 +16,9 @@ async function trackClick(button) {
     country: document.body.dataset.country || "",
     region: document.body.dataset.region || "",
     city: document.body.dataset.city || "",
+    offer_id: document.body.dataset.offerId || "",
   };
+  const next = safeOutbound(document.body.dataset.offerUrl || "");
 
   try {
     const response = await fetch("/api/click", {
@@ -27,11 +29,22 @@ async function trackClick(button) {
     });
     if (!response.ok) throw new Error(String(response.status));
     status.textContent = button.dataset.done || "Saved";
+    if (next) location.assign(next);
   } catch {
     status.textContent = "The click could not be recorded. Try again.";
     button.disabled = false;
     button.dataset.pending = "0";
   }
+}
+
+function safeOutbound(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol === "https:") return url.toString();
+  } catch {
+    return "";
+  }
+  return "";
 }
 
 function ensureStatus(button) {

@@ -4,6 +4,7 @@ import { resolveContent, safeHero } from "../functions/_lib/content.js";
 import { resolveGeo } from "../functions/_lib/geo.js";
 import { readCookie, resolveVariant } from "../functions/_lib/cookies.js";
 import { conversion } from "../functions/_lib/db.js";
+import { assignShares, pickOffer, validateOfferUrl } from "../functions/_lib/offers.js";
 
 const config = {
   variants: {
@@ -73,4 +74,41 @@ assert.equal(conversion(0, 0), null);
 assert.equal(conversion(4, 1), 25);
 assert.equal(conversion(3, 1), 33.3);
 
-console.log("content, geo, variant, and conversion checks passed");
+const offers = [
+  { id: "de", priority: 0, geos: ["DE"] },
+  { id: "us", priority: 1, geos: ["US", "CA"] },
+  { id: "world", priority: 2, geos: [] },
+];
+assert.equal(pickOffer(offers, "US").id, "us");
+assert.equal(pickOffer(offers, "DE").id, "de");
+assert.equal(pickOffer(offers, "FR").id, "world");
+assert.equal(validateOfferUrl("telegram", "https://t.me/geo"), "https://t.me/geo");
+assert.equal(validateOfferUrl("telegram", "https://example.com"), "");
+assert.equal(validateOfferUrl("octocpa", "http://example.com/offer"), "");
+
+const freshShare = assignShares([
+  { id: "winner", clicks: 20, impressions: 200 },
+  { id: "newbie", clicks: 0, impressions: 0 },
+]);
+const freshRatio = freshShare[1].share / freshShare[0].share;
+assert.ok(freshRatio > 0.8 && freshRatio < 1.2, freshRatio);
+
+const faded = assignShares([
+  { id: "winner", clicks: 20, impressions: 200 },
+  { id: "newbie", clicks: 0, impressions: 200 },
+]);
+assert.ok(faded[1].share < faded[0].share / 5);
+
+const equal = assignShares([
+  { id: "a", clicks: 0, impressions: 0 },
+  { id: "b", clicks: 0, impressions: 0 },
+]);
+assert.equal(equal[0].share, equal[1].share);
+
+const clicked = assignShares([
+  { id: "a", clicks: 10, impressions: 200 },
+  { id: "b", clicks: 2, impressions: 200 },
+]);
+assert.ok(clicked[0].share > clicked[1].share);
+
+console.log("content, geo, variant, conversion, and offer checks passed");

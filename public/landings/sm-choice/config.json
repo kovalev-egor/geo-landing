@@ -1,0 +1,15 @@
+{
+  "id": "sm-choice",
+  "name": "Sexymeet Choice",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "headline": "Pick her. She's already on.",
+        "cta": "Chat with Alice now",
+        "done": "Opening your room…",
+        "hero": "/landings/sm-choice/images/alice.jpg"
+      }
+    }
+  }
+}

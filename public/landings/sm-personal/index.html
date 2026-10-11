@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Alice is live — sexymeet</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/sexymeet.css?v=4">
+</head>
+<body data-landing-id="{{landing_id}}" data-variant="{{variant}}" data-country="{{country}}" data-region="{{region}}" data-city="{{city}}" data-offer-id="{{offer_id}}" data-offer-url="{{offer_url}}">
+  {{preview}}
+  <main class="screen">
+    <img class="hero" src="/media/sexymeet/alice.jpg" alt="Alice looking at you">
+    <div class="shade" aria-hidden="true"></div>
+    <header class="top">
+      <p class="brand">sexy<span>meet</span></p>
+      <span class="badge">Claim free tokens</span>
+    </header>
+    <section class="copy">
+      <p class="sub"><span class="dot pulse"></span> Online now · {{place}}</p>
+      <h1>I'm free. Come talk to me.</h1>
+      <p class="wait">Alice has been waiting <span data-wait>1:24</span></p>
+      <button class="cta" type="button" data-track="cta" data-done="{{done}}">Talk to me now</button>
+      <p class="fine"><span data-men>14</span> men chatting · free tokens on signup</p>
+    </section>
+  </main>
+  <script src="/js/sexymeet.js" defer></script>
+  <script src="/js/track.js" defer></script>
+</body>
+</html>

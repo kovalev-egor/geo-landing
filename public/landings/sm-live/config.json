@@ -1,0 +1,15 @@
+{
+  "id": "sm-live",
+  "name": "Sexymeet Live",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "headline": "Don't keep her waiting.",
+        "cta": "Join her private room",
+        "done": "Opening your room…",
+        "hero": "/landings/sm-live/images/mia.jpg"
+      }
+    }
+  }
+}

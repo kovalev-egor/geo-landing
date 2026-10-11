@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pick who's live — sexymeet</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/sexymeet.css?v=4">
+</head>
+<body data-landing-id="{{landing_id}}" data-variant="{{variant}}" data-country="{{country}}" data-region="{{region}}" data-city="{{city}}" data-offer-id="{{offer_id}}" data-offer-url="{{offer_url}}">
+  {{preview}}
+  <main class="screen">
+    <header class="top">
+      <p class="brand">sexy<span>meet</span></p>
+      <span class="badge">Claim free tokens</span>
+    </header>
+    <p class="kicker"><span class="dot pulse"></span> Live in {{place}}</p>
+    <h1>Pick her. She's already on.</h1>
+    <div class="picks">
+      <button class="pick is-on" type="button" data-name="Alice">
+        <img src="/media/sexymeet/alice.jpg" alt="">
+        <span><strong>Alice</strong><em><span class="dot"></span> Online now</em></span>
+      </button>
+      <button class="pick" type="button" data-name="Mia">
+        <img src="/media/sexymeet/mia.jpg" alt="">
+        <span><strong>Mia</strong><em><span class="dot"></span> Online now</em></span>
+      </button>
+      <button class="pick" type="button" data-name="Lena">
+        <img src="/media/sexymeet/lena.jpg" alt="">
+        <span><strong>Lena</strong><em><span class="dot"></span> Online now</em></span>
+      </button>
+    </div>
+    <section class="stack">
+      <button class="cta" type="button" data-track="cta" data-done="{{done}}">Chat with Alice now</button>
+      <p class="fine">Free tokens on signup</p>
+    </section>
+  </main>
+  <script src="/js/sexymeet.js" defer></script>
+  <script src="/js/track.js" defer></script>
+</body>
+</html>

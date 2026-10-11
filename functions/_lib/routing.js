@@ -18,7 +18,7 @@ export async function prepareHome(context) {
     const preview = previewEnabled(context.env);
     const geo = resolveGeo(context.request, preview);
     const graph = await loadOfferGraph(context.env.DB);
-    const candidates = candidatesForCountry(graph, registry.map((item) => item.id), geo.country);
+    const candidates = routePool(candidatesForCountry(graph, registry.map((item) => item.id), geo.country));
     if (!candidates.length) return { ...fallback, country: geo.country };
     const stuck = candidates.find((item) => routeToken(item.landingId, item.offer.id) === readCookie(context.request, ROUTE_COOKIE));
     const picked = stuck || pickWeighted(candidates, randomUnit());
@@ -97,6 +97,11 @@ export async function loadOfferGraph(db) {
     });
   }
   return { offers, links, stats };
+}
+
+export function routePool(candidates) {
+  const octo = candidates.filter((item) => item.offer?.kind === "octocpa");
+  return octo.length ? octo : candidates;
 }
 
 export function candidatesForCountry(graph, landingIds, country) {

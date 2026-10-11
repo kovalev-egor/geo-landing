@@ -1,0 +1,15 @@
+{
+  "id": "sm-personal",
+  "name": "Sexymeet Personal",
+  "variants": {
+    "A": {
+      "default": {
+        "lang": "en",
+        "headline": "I'm free. Come talk to me.",
+        "cta": "Talk to me now",
+        "done": "Opening your room…",
+        "hero": "/landings/sm-personal/images/alice.jpg"
+      }
+    }
+  }
+}

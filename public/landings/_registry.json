@@ -1,5 +1,20 @@
 [
   {
+    "id": "sm-personal",
+    "name": "Sexymeet Personal",
+    "blurb": "One girl, private, right now"
+  },
+  {
+    "id": "sm-choice",
+    "name": "Sexymeet Choice",
+    "blurb": "Pick who is live"
+  },
+  {
+    "id": "sm-live",
+    "name": "Sexymeet Live",
+    "blurb": "Girls online, don't wait"
+  },
+  {
     "id": "alice",
     "name": "Alice",
     "blurb": "Alice"

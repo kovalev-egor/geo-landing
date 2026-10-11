@@ -4,7 +4,7 @@ import { resolveContent, safeHero } from "../functions/_lib/content.js";
 import { resolveGeo } from "../functions/_lib/geo.js";
 import { readCookie, resolveVariant } from "../functions/_lib/cookies.js";
 import { conversion } from "../functions/_lib/db.js";
-import { assignShares, encodeGeos, pickOffer, readStoredGeos, validateOfferUrl } from "../functions/_lib/offers.js";
+import { assignShares, encodeGeos, pickOffer, pickWeighted, readStoredGeos, validateOfferUrl } from "../functions/_lib/offers.js";
 import { routePool } from "../functions/_lib/routing.js";
 
 const config = {
@@ -104,6 +104,12 @@ const mixedPool = [
 const octoOnly = routePool(mixedPool);
 assert.deepEqual(octoOnly.map((item) => item.landingId), ["sm-personal", "sm-choice"]);
 assert.equal(routePool([{ landingId: "alice", offer: { kind: "telegram" } }])[0].landingId, "alice");
+const bandit = [
+  { landingId: "sm-personal", clicks: 0, impressions: 0 },
+  { landingId: "sm-choice", clicks: 0, impressions: 0 },
+];
+assert.equal(pickWeighted(bandit, 0).landingId, "sm-personal");
+assert.equal(pickWeighted(bandit, () => 0.99).landingId, "sm-choice");
 assert.equal(validateOfferUrl("telegram", "https://t.me/geo"), "https://t.me/geo");
 assert.equal(validateOfferUrl("telegram", "https://example.com"), "");
 assert.equal(validateOfferUrl("octocpa", "http://example.com/offer"), "");

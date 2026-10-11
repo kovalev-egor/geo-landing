@@ -21,7 +21,7 @@ export async function prepareHome(context) {
     const candidates = routePool(candidatesForCountry(graph, registry.map((item) => item.id), geo.country));
     if (!candidates.length) return { ...fallback, country: geo.country };
     const stuck = candidates.find((item) => routeToken(item.landingId, item.offer.id) === readCookie(context.request, ROUTE_COOKIE));
-    const picked = stuck || pickWeighted(candidates, randomUnit());
+    const picked = stuck || pickWeighted(candidates, randomUnit);
     const cookies = [];
     if (!stuck) {
       cookies.push(cookie(context.request, ROUTE_COOKIE, routeToken(picked.landingId, picked.offer.id)));

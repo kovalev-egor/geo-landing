@@ -81,7 +81,8 @@ export function pickWeighted(rows, random) {
   const weighted = comboWeights(rows);
   if (!weighted.length) return null;
   const total = weighted.reduce((sum, row) => sum + row.weight, 0);
-  let cursor = random() * total;
+  const roll = typeof random === "function" ? random() : Number(random);
+  let cursor = roll * total;
   for (const row of weighted) {
     cursor -= row.weight;
     if (cursor <= 0) return row;

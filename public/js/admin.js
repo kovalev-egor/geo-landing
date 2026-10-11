@@ -131,7 +131,7 @@ function renderCard(landing, preview, route) {
   card.append(variantTable(landing.variants));
   card.append(el("p", { class: "blurb" }, countryLine(landing.countries)));
   const links = el("p", { class: "links" });
-  links.append(el("a", { href: `/l/${landing.id}`, target: "_blank", rel: "noreferrer" }, "Открыть"));
+  links.append(el("a", { href: "/l/alice", target: "_blank", rel: "noreferrer" }, "Открыть"));
   if (preview) {
     for (const geo of landing.geos) {
       links.append(el("a", { href: previewHref(landing.id, geo), target: "_blank", rel: "noreferrer" }, geo));
@@ -152,7 +152,7 @@ function renderDetail(data, route, catalog) {
   if (landing.created_at) meta.push(`в базе с ${formatStamp(landing.created_at)} UTC`);
   else meta.push("первого показа ещё не было");
   title.append(el("p", { class: "blurb" }, meta.join(" · ")));
-  const open = el("a", { href: `/l/${landing.id}`, target: "_blank", rel: "noreferrer" }, "Открыть лендинг");
+  const open = el("a", { href: "/l/alice", target: "_blank", rel: "noreferrer" }, "Открыть лендинг");
   head.append(title, open);
   wrap.append(head, metrics(landing));
 
@@ -269,7 +269,7 @@ function previewHref(id, geo) {
   const [country, region] = geo.split("-");
   const params = new URLSearchParams({ country });
   if (region) params.set("region", region);
-  return `/l/${id}?${params}`;
+  return `/l/alice?${params}`;
 }
 
 function hashHref(id, range) {
